@@ -1,0 +1,6 @@
+{
+  "recursive": true,
+  "require": "jsdom-global/register",
+  "reporter": "mochawesome",
+  "reporter-options": ["reportDir=reports/test", "quiet"]
+}
