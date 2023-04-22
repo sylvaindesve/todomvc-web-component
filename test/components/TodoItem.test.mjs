@@ -1,117 +1,126 @@
 import "../../public/js/components/TodoItem.mjs";
+import { beforeEach, describe, it } from "mocha";
 import chai, { expect } from "chai";
-import { describe, it } from "mocha";
 import sinon from "sinon";
 import sinonChai from "sinon-chai";
 
 chai.use(sinonChai);
 
-describe("TodoItem", () => {
-  it("should be in view mode", () => {
+describe("TodoItem", function () {
+  beforeEach(function () {
     document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    expect(todoItem.viewSection.classList.contains("hide")).to.be.false;
-    expect(todoItem.editDescriptionInput.classList.contains("hide")).to.be.true;
+    this.currentTest.todoItem = document.querySelector("todo-item");
+    this.currentTest.eventListenerCallback = sinon.fake();
+  });
+  it("should be in view mode", function () {
+    expect(this.test.todoItem.viewSection.classList.contains("hide")).to.be
+      .false;
+    expect(this.test.todoItem.editDescriptionInput.classList.contains("hide"))
+      .to.be.true;
   });
 
-  it("should render the description", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    expect(todoItem.descriptionLabel.innerHTML).to.equal("Quelque chose");
+  it("should render the description", function () {
+    expect(this.test.todoItem.descriptionLabel.innerHTML).to.equal(
+      "Quelque chose"
+    );
   });
 
-  it("should update when description is changed", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    todoItem.setAttribute("description", "Autre chose");
-    expect(todoItem.descriptionLabel.innerHTML).to.equal("Autre chose");
+  it("should update when description is changed", function () {
+    this.test.todoItem.setAttribute("description", "Autre chose");
+    expect(this.test.todoItem.descriptionLabel.innerHTML).to.equal(
+      "Autre chose"
+    );
   });
 
-  it("should not be checked if not completed", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    expect(todoItem.completedCheckbox.checked).to.be.false;
-  });
-
-  it("should not checked if completed", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose" completed></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    expect(todoItem.completedCheckbox.checked).to.be.true;
-  });
-
-  it("should update when completed attribute is changed", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose" completed></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    todoItem.removeAttribute("completed");
-    expect(todoItem.completedCheckbox.checked).to.be.false;
-    todoItem.setAttribute("completed", "completed");
-    expect(todoItem.completedCheckbox.checked).to.be.true;
-  });
-
-  it("should dispatch a 'todo-item-completed' event when the checkbox is checked", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    const callback = sinon.fake();
-    todoItem.addEventListener("todo-item-completed", callback);
-    todoItem.completedCheckbox.click();
-    expect(callback).to.have.been.called;
-  });
-
-  it("should dispatch a 'todo-item-to-do' event when the checkbox is unchecked", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose" completed></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    const callback = sinon.fake();
-    todoItem.addEventListener("todo-item-to-do", callback);
-    todoItem.completedCheckbox.click();
-    expect(callback).to.have.been.called;
-  });
-
-  it("should dispatch a 'todo-item-deleted' event when the delete button is clicked", () => {
-    document.body.innerHTML = `<todo-item description="Titre de test"></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    const callback = sinon.fake();
-    todoItem.addEventListener("todo-item-deleted", callback);
-    todoItem.deleteButton.click();
-    expect(callback).to.have.been.called;
-  });
-
-  it("should switch to edit mode when the description is double-clicked", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    dblClick(todoItem.descriptionLabel);
-    expect(todoItem.viewSection.classList.contains("hide")).to.be.true;
-    expect(todoItem.editDescriptionInput.classList.contains("hide")).to.be
+  it("should not be checked if not completed", function () {
+    expect(this.test.todoItem.completedCheckbox.checked).to.be.false;
+    expect(this.test.todoItem.completedCheckbox.hasAttribute("checked")).to.be
       .false;
   });
 
-  it("should have the edit input initialized with current description", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
+  it("should be checked if completed", function () {
+    document.body.innerHTML = `<todo-item description="Quelque chose" completed></todo-item>`;
     const todoItem = document.querySelector("todo-item");
-    dblClick(todoItem.descriptionLabel);
-    expect(todoItem.editDescriptionInput.value).to.equal("Quelque chose");
+    expect(todoItem.completedCheckbox.checked).to.be.true;
+    expect(todoItem.completedCheckbox.hasAttribute("checked")).to.be.true;
   });
 
-  it("should switch back to view mode when user enters Escape in the input", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    dblClick(todoItem.descriptionLabel);
-    enterKey(todoItem.editDescriptionInput, "Escape");
-    expect(todoItem.viewSection.classList.contains("hide")).to.be.false;
-    expect(todoItem.editDescriptionInput.classList.contains("hide")).to.be.true;
+  it("should update when completed attribute is changed", function () {
+    this.test.todoItem.setAttribute("completed", "completed");
+    expect(this.test.todoItem.completedCheckbox.checked).to.be.true;
+    this.test.todoItem.removeAttribute("completed");
+    expect(this.test.todoItem.completedCheckbox.checked).to.be.false;
   });
 
-  it("should dispatch a 'todo-item-description-updated' event with new description and switch back to view mode", () => {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
+  it("should dispatch a 'todo-item-completed' event when the checkbox is checked", function () {
+    this.test.todoItem.addEventListener(
+      "todo-item-completed",
+      this.test.eventListenerCallback
+    );
+    this.test.todoItem.completedCheckbox.click();
+    expect(this.test.eventListenerCallback).to.have.been.called;
+  });
+
+  it("should dispatch a 'todo-item-to-do' event when the checkbox is unchecked", function () {
+    document.body.innerHTML = `<todo-item description="Quelque chose" completed></todo-item>`;
     const todoItem = document.querySelector("todo-item");
-    const callback = sinon.fake();
-    todoItem.addEventListener("todo-item-description-updated", callback);
-    dblClick(todoItem.descriptionLabel);
-    todoItem.editDescriptionInput.value = "Nouvelle description";
-    todoItem.editDescriptionInput.dispatchEvent(new Event("change"));
-    expect(callback).to.have.been.called;
-    expect(callback.firstCall.firstArg.detail).to.equal("Nouvelle description");
-    expect(todoItem.viewSection.classList.contains("hide")).to.be.false;
-    expect(todoItem.editDescriptionInput.classList.contains("hide")).to.be.true;
+    todoItem.addEventListener(
+      "todo-item-to-do",
+      this.test.eventListenerCallback
+    );
+    todoItem.completedCheckbox.click();
+    expect(this.test.eventListenerCallback).to.have.been.called;
+  });
+
+  it("should dispatch a 'todo-item-deleted' event when the delete button is clicked", function () {
+    this.test.todoItem.addEventListener(
+      "todo-item-deleted",
+      this.test.eventListenerCallback
+    );
+    this.test.todoItem.deleteButton.click();
+    expect(this.test.eventListenerCallback).to.have.been.called;
+  });
+
+  it("should switch to edit mode when the description is double-clicked", function () {
+    dblClick(this.test.todoItem.descriptionLabel);
+    expect(this.test.todoItem.viewSection.classList.contains("hide")).to.be
+      .true;
+    expect(this.test.todoItem.editDescriptionInput.classList.contains("hide"))
+      .to.be.false;
+  });
+
+  it("should have the edit input initialized with current description", function () {
+    dblClick(this.test.todoItem.descriptionLabel);
+    expect(this.test.todoItem.editDescriptionInput.value).to.equal(
+      "Quelque chose"
+    );
+  });
+
+  it("should switch back to view mode when user enters Escape in the input", function () {
+    dblClick(this.test.todoItem.descriptionLabel);
+    enterKey(this.test.todoItem.editDescriptionInput, "Escape");
+    expect(this.test.todoItem.viewSection.classList.contains("hide")).to.be
+      .false;
+    expect(this.test.todoItem.editDescriptionInput.classList.contains("hide"))
+      .to.be.true;
+  });
+
+  it("should dispatch a 'todo-item-description-updated' event with new description and switch back to view mode", function () {
+    this.test.todoItem.addEventListener(
+      "todo-item-description-updated",
+      this.test.eventListenerCallback
+    );
+    dblClick(this.test.todoItem.descriptionLabel);
+    this.test.todoItem.editDescriptionInput.value = "Nouvelle description";
+    this.test.todoItem.editDescriptionInput.dispatchEvent(new Event("change"));
+    expect(this.test.eventListenerCallback).to.have.been.called;
+    expect(this.test.eventListenerCallback.firstCall.firstArg.detail).to.equal(
+      "Nouvelle description"
+    );
+    expect(this.test.todoItem.viewSection.classList.contains("hide")).to.be
+      .false;
+    expect(this.test.todoItem.editDescriptionInput.classList.contains("hide"))
+      .to.be.true;
   });
 });
 
