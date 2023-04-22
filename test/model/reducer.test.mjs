@@ -12,26 +12,49 @@ import { describe, it } from "mocha";
 import reducer, { selectItems } from "../../public/js/model/reducer.mjs";
 import { expect } from "chai";
 
-describe("reducer", () => {
-  it("should initialize to empty items and 'all' filter", () => {
+function getThreeItemsState() {
+  return {
+    items: {
+      "item-1": {
+        id: "item-1",
+        description: "Item 1",
+        completed: false,
+      },
+      "item-2": {
+        id: "item-2",
+        description: "Item 2",
+        completed: true,
+      },
+      "item-3": {
+        id: "item-3",
+        description: "Item 3",
+        completed: false,
+      },
+    },
+    filter: "all",
+  };
+}
+
+describe("reducer", function () {
+  it("should initialize to empty items and 'all' filter", function () {
     const initialState = reducer(undefined, { type: "@@INIT" });
     expect(initialState).to.deep.equal({ items: {}, filter: "all" });
   });
 
-  describe("adding an item", () => {
-    it("should add the provided item", () => {
-      const initialState = { items: {}, filter: "all" };
+  describe("adding an item", function () {
+    it("should add the provided item", function () {
       const newItem = {
-        id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-        description: "Acheter du beurre de cacahuète",
+        id: "item-4",
+        description: "Item 4",
         completed: false,
       };
-      const newState = reducer(initialState, addItem(newItem));
+      const newState = reducer(getThreeItemsState(), addItem(newItem));
       expect(newState).to.deep.equal({
         items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
+          ...getThreeItemsState().items,
+          "item-4": {
+            id: "item-4",
+            description: "Item 4",
             completed: false,
           },
         },
@@ -39,119 +62,61 @@ describe("reducer", () => {
       });
     });
 
-    it("should not change the initial state", () => {
-      const initialState = { items: {}, filter: "all" };
+    it("should not change the initial state", function () {
+      const initialState = getThreeItemsState();
       const newItem = {
         id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
         description: "Acheter du beurre de cacahuète",
         completed: false,
       };
       reducer(initialState, addItem(newItem));
-      expect(initialState).to.deep.equal({ items: {}, filter: "all" });
+      expect(initialState).to.deep.equal(getThreeItemsState());
     });
   });
 
-  describe("updating an item description", () => {
-    it("should update the item description", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: false,
-          },
-        },
-        filter: "all",
-      };
+  describe("updating an item description", function () {
+    it("should update the item description", function () {
       const newState = reducer(
-        initialState,
-        updateItemDescription(
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-          "Acheter du tofu"
-        )
+        getThreeItemsState(),
+        updateItemDescription("item-2", "Item 2 updated")
       );
       expect(newState).to.deep.equal({
         items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du tofu",
-            completed: false,
+          ...getThreeItemsState().items,
+          "item-2": {
+            id: "item-2",
+            description: "Item 2 updated",
+            completed: true,
           },
         },
         filter: "all",
       });
     });
 
-    it("should do nothing if provided ID does not point to any item", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-          filter: "all",
-        },
-      };
+    it("should do nothing if provided ID does not point to any item", function () {
       const newState = reducer(
-        initialState,
-        updateItemDescription("unknown-id", "Acheter du tofu")
+        getThreeItemsState(),
+        updateItemDescription("unknown-id", "Unknown item")
       );
-      expect(newState).to.deep.equal(initialState);
+      expect(newState).to.deep.equal(getThreeItemsState());
     });
 
-    it("should not change the initial state", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
-      reducer(
-        initialState,
-        updateItemDescription(
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-          "Acheter du tofu"
-        )
-      );
-      expect(initialState).to.deep.equal({
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      });
+    it("should not change the initial state", function () {
+      const initialState = getThreeItemsState();
+      reducer(initialState, updateItemDescription("item-2", "Item 2 updated"));
+      expect(initialState).to.deep.equal(getThreeItemsState());
     });
   });
 
-  describe("complete an item", () => {
-    it("should change the item state to completed", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: false,
-          },
-        },
-        filter: "all",
-      };
-      const newState = reducer(
-        initialState,
-        completeItem("49b6c1cd-25e2-4d84-b37d-768fccd59b24")
-      );
+  describe("complete an item", function () {
+    it("should change the item state to completed", function () {
+      const newState = reducer(getThreeItemsState(), completeItem("item-1"));
       expect(newState).to.deep.equal({
         items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
+          ...getThreeItemsState().items,
+          "item-1": {
+            id: "item-1",
+            description: "Item 1",
             completed: true,
           },
         },
@@ -159,70 +124,30 @@ describe("reducer", () => {
       });
     });
 
-    it("should do nothing if provided ID does not point to any item", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
-      const newState = reducer(initialState, completeItem("unknown-id"));
-      expect(newState).to.deep.equal(initialState);
-    });
-
-    it("should not change the initial state", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
-      reducer(
-        initialState,
-        completeItem("49b6c1cd-25e2-4d84-b37d-768fccd59b24")
+    it("should do nothing if provided ID does not point to any item", function () {
+      const newState = reducer(
+        getThreeItemsState(),
+        completeItem("unknown-id")
       );
-      expect(initialState).to.deep.equal({
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      });
+      expect(newState).to.deep.equal(getThreeItemsState());
+    });
+
+    it("should not change the initial state", function () {
+      const initialState = getThreeItemsState();
+      reducer(initialState, completeItem("item-1"));
+      expect(initialState).to.deep.equal(getThreeItemsState());
     });
   });
 
-  describe("uncomplete an item", () => {
-    it("should change the item state to not completed", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
-      const newState = reducer(
-        initialState,
-        uncompleteItem("49b6c1cd-25e2-4d84-b37d-768fccd59b24")
-      );
+  describe("uncomplete an item", function () {
+    it("should change the item state to not completed", function () {
+      const newState = reducer(getThreeItemsState(), uncompleteItem("item-2"));
       expect(newState).to.deep.equal({
         items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
+          ...getThreeItemsState().items,
+          "item-2": {
+            id: "item-2",
+            description: "Item 2",
             completed: false,
           },
         },
@@ -230,75 +155,34 @@ describe("reducer", () => {
       });
     });
 
-    it("should do nothing if provided ID does not point to any item", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
-      const newState = reducer(initialState, uncompleteItem("unknown-id"));
-      expect(newState).to.deep.equal(initialState);
+    it("should do nothing if provided ID does not point to any item", function () {
+      const newState = reducer(
+        getThreeItemsState(),
+        uncompleteItem("unknown-id")
+      );
+      expect(newState).to.deep.equal(getThreeItemsState());
     });
 
-    it("should not change the initial state", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
-      reducer(
-        initialState,
-        uncompleteItem("49b6c1cd-25e2-4d84-b37d-768fccd59b24")
-      );
-      expect(initialState).to.deep.equal({
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      });
+    it("should not change the initial state", function () {
+      const initialState = getThreeItemsState();
+      reducer(initialState, uncompleteItem("item-2"));
+      expect(initialState).to.deep.equal(getThreeItemsState());
     });
   });
 
-  describe("removing an item", () => {
-    it("should remove the item with the provided ID", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-          "b9929567-1cb7-4b35-9c4d-bae2b8ee625c": {
-            id: "b9929567-1cb7-4b35-9c4d-bae2b8ee625c",
-            description: "Trouver du bon café",
-            completed: false,
-          },
-        },
-        filter: "all",
-      };
-      const newState = reducer(
-        initialState,
-        removeItem("49b6c1cd-25e2-4d84-b37d-768fccd59b24")
-      );
+  describe("removing an item", function () {
+    it("should remove the item with the provided ID", function () {
+      const newState = reducer(getThreeItemsState(), removeItem("item-1"));
       expect(newState).to.deep.equal({
         items: {
-          "b9929567-1cb7-4b35-9c4d-bae2b8ee625c": {
-            id: "b9929567-1cb7-4b35-9c4d-bae2b8ee625c",
-            description: "Trouver du bon café",
+          "item-2": {
+            id: "item-2",
+            description: "Item 2",
+            completed: true,
+          },
+          "item-3": {
+            id: "item-3",
+            description: "Item 3",
             completed: false,
           },
         },
@@ -306,132 +190,58 @@ describe("reducer", () => {
       });
     });
 
-    it("should not change the initial state", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
-      reducer(initialState, removeItem("49b6c1cd-25e2-4d84-b37d-768fccd59b24"));
-      expect(initialState).to.deep.equal({
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-        },
-        filter: "all",
-      });
+    it("should do nothing if there is no item with the provided ID", function () {
+      const initialState = getThreeItemsState();
+      const newState = reducer(initialState, removeItem("unknown-id"));
+      expect(newState).to.deep.equal(getThreeItemsState());
+    });
+
+    it("should not change the initial state", function () {
+      const initialState = getThreeItemsState();
+      reducer(initialState, removeItem("item-1"));
+      expect(initialState).to.deep.equal(getThreeItemsState());
     });
   });
 
-  describe("removing completed items", () => {
-    it("should remove completed items", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-          "b9929567-1cb7-4b35-9c4d-bae2b8ee625c": {
-            id: "b9929567-1cb7-4b35-9c4d-bae2b8ee625c",
-            description: "Trouver du bon café",
-            completed: false,
-          },
-          "65168839-90f9-4605-87b8-0d3ac8987451": {
-            id: "65168839-90f9-4605-87b8-0d3ac8987451",
-            description: "Acheter du lait",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
-      const newState = reducer(initialState, removeCompleted());
+  describe("removing completed items", function () {
+    it("should remove completed items", function () {
+      const newState = reducer(getThreeItemsState(), removeCompleted());
       expect(newState).to.deep.equal({
         items: {
-          "b9929567-1cb7-4b35-9c4d-bae2b8ee625c": {
-            id: "b9929567-1cb7-4b35-9c4d-bae2b8ee625c",
-            description: "Trouver du bon café",
+          "item-1": {
+            id: "item-1",
+            description: "Item 1",
+            completed: false,
+          },
+          "item-3": {
+            id: "item-3",
+            description: "Item 3",
             completed: false,
           },
         },
         filter: "all",
       });
     });
-    it("should not change the initial state", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-          "b9929567-1cb7-4b35-9c4d-bae2b8ee625c": {
-            id: "b9929567-1cb7-4b35-9c4d-bae2b8ee625c",
-            description: "Trouver du bon café",
-            completed: false,
-          },
-          "65168839-90f9-4605-87b8-0d3ac8987451": {
-            id: "65168839-90f9-4605-87b8-0d3ac8987451",
-            description: "Acheter du lait",
-            completed: true,
-          },
-        },
-        filter: "all",
-      };
+    it("should not change the initial state", function () {
+      const initialState = getThreeItemsState();
       reducer(initialState, removeCompleted());
-      expect(initialState).to.deep.equal({
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: true,
-          },
-          "b9929567-1cb7-4b35-9c4d-bae2b8ee625c": {
-            id: "b9929567-1cb7-4b35-9c4d-bae2b8ee625c",
-            description: "Trouver du bon café",
-            completed: false,
-          },
-          "65168839-90f9-4605-87b8-0d3ac8987451": {
-            id: "65168839-90f9-4605-87b8-0d3ac8987451",
-            description: "Acheter du lait",
-            completed: true,
-          },
-        },
-        filter: "all",
-      });
+      expect(initialState).to.deep.equal(getThreeItemsState());
     });
   });
 
-  describe("setting state", () => {
-    it("should replace with provided state", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: false,
-          },
-        },
-        filter: "all",
-      };
+  describe("setting state", function () {
+    it("should replace with provided state", function () {
+      const initialState = getThreeItemsState();
       const futureState = {
         items: {
-          "280652c3-b823-472c-9386-9a511d299f1b": {
-            id: "280652c3-b823-472c-9386-9a511d299f1b",
-            description: "Faire du sport",
-            completed: false,
+          "item-4": {
+            id: "item-4",
+            description: "Item 4",
+            completed: true,
           },
-          "f6ef974a-104d-431e-8262-c5ce06b22c1f": {
-            id: "f6ef974a-104d-431e-8262-c5ce06b22c1f",
-            description: "Bien dormir",
+          "item-5": {
+            id: "item-5",
+            description: "Item 5",
             completed: false,
           },
         },
@@ -440,14 +250,14 @@ describe("reducer", () => {
       const newState = reducer(initialState, setState(futureState));
       expect(newState).to.deep.equal({
         items: {
-          "280652c3-b823-472c-9386-9a511d299f1b": {
-            id: "280652c3-b823-472c-9386-9a511d299f1b",
-            description: "Faire du sport",
-            completed: false,
+          "item-4": {
+            id: "item-4",
+            description: "Item 4",
+            completed: true,
           },
-          "f6ef974a-104d-431e-8262-c5ce06b22c1f": {
-            id: "f6ef974a-104d-431e-8262-c5ce06b22c1f",
-            description: "Bien dormir",
+          "item-5": {
+            id: "item-5",
+            description: "Item 5",
             completed: false,
           },
         },
@@ -455,100 +265,62 @@ describe("reducer", () => {
       });
     });
 
-    it("should not change the initial state", () => {
-      const initialState = {
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: false,
-          },
-        },
-        filter: "all",
-      };
+    it("should not change the initial state", function () {
+      const initialState = getThreeItemsState();
       const futureState = {
         items: {
-          "280652c3-b823-472c-9386-9a511d299f1b": {
-            id: "280652c3-b823-472c-9386-9a511d299f1b",
-            description: "Faire du sport",
-            completed: false,
+          "item-4": {
+            id: "item-4",
+            description: "Item 4",
+            completed: true,
           },
-          "f6ef974a-104d-431e-8262-c5ce06b22c1f": {
-            id: "f6ef974a-104d-431e-8262-c5ce06b22c1f",
-            description: "Bien dormir",
+          "item-5": {
+            id: "item-5",
+            description: "Item 5",
             completed: false,
           },
         },
         filter: "active",
       };
       reducer(initialState, setState(futureState));
-      expect(initialState).to.deep.equal({
-        items: {
-          "49b6c1cd-25e2-4d84-b37d-768fccd59b24": {
-            id: "49b6c1cd-25e2-4d84-b37d-768fccd59b24",
-            description: "Acheter du beurre de cacahuète",
-            completed: false,
-          },
-        },
-        filter: "all",
-      });
+      expect(initialState).to.deep.equal(getThreeItemsState());
     });
   });
 
-  describe("Set filter", () => {
-    it("should set the filter value", () => {
-      const initialState = {
-        items: {},
-        filter: "all",
-      };
-      const newState = reducer(initialState, setFilter("active"));
+  describe("Set filter", function () {
+    it("should set the filter value", function () {
+      const newState = reducer(getThreeItemsState(), setFilter("active"));
       expect(newState).to.deep.equal({
-        items: {},
+        items: getThreeItemsState().items,
         filter: "active",
       });
     });
 
-    it("should not change the initial state", () => {
-      const initialState = {
-        items: {},
-        filter: "all",
-      };
+    it("should not change the initial state", function () {
+      const initialState = getThreeItemsState();
       reducer(initialState, setFilter("active"));
-      expect(initialState).to.deep.equal({
-        items: {},
-        filter: "all",
-      });
+      expect(initialState).to.deep.equal(getThreeItemsState());
     });
   });
 });
 
-describe("selectItems", () => {
-  it("should return items as array from a state", () => {
-    const state = {
-      items: {
-        "280652c3-b823-472c-9386-9a511d299f1b": {
-          id: "280652c3-b823-472c-9386-9a511d299f1b",
-          description: "Faire du sport",
-          completed: false,
-        },
-        "f6ef974a-104d-431e-8262-c5ce06b22c1f": {
-          id: "f6ef974a-104d-431e-8262-c5ce06b22c1f",
-          description: "Bien dormir",
-          completed: false,
-        },
-      },
-      filter: "all",
-    };
-    const items = selectItems(state);
+describe("selectItems", function () {
+  it("should return items as array from a state", function () {
+    const items = selectItems(getThreeItemsState());
     expect(items).to.deep.equal([
       {
-        id: "280652c3-b823-472c-9386-9a511d299f1b",
-        description: "Faire du sport",
+        id: "item-1",
+        description: "Item 1",
         completed: false,
       },
       {
-        id: "f6ef974a-104d-431e-8262-c5ce06b22c1f",
-        description: "Bien dormir",
+        id: "item-2",
+        description: "Item 2",
+        completed: true,
+      },
+      {
+        id: "item-3",
+        description: "Item 3",
         completed: false,
       },
     ]);
