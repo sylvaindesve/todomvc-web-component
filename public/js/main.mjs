@@ -1,3 +1,4 @@
+import "./components/TodoItem.mjs";
 import { StateStore } from "./model/StateStore.mjs";
 import { TodoApp } from "./controller/TodoApp.mjs";
 import { TodoList } from "./components/TodoList.mjs";
@@ -8,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const store = new StateStore(reducer);
   const todoList = new TodoList();
 
-  new TodoApp(store, todoList);
+  new TodoApp(store, todoList, "todo-item");
   document.getElementById("root").appendChild(todoList);
 
   if (window.localStorage) {

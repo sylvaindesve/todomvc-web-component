@@ -6,7 +6,6 @@ import {
   uncompleteItem,
   updateItemDescription,
 } from "../model/actions.mjs";
-import { TodoItem } from "../components/TodoItem.mjs";
 import { removeItem } from "../model/actions.mjs";
 import { selectItems } from "../model/reducer.mjs";
 
@@ -17,9 +16,16 @@ export class TodoApp {
   /** @type {import("../components/TodoList.mjs").TodoList} */
   #view;
 
-  constructor(model, view) {
+  /**
+   * @type {string} Le nom de la balise HTML à utiliser pour créer les vues sur
+   * les items
+   */
+  #todoItemViewTagName;
+
+  constructor(model, view, todoItemViewTagName) {
     this.#model = model;
     this.#view = view;
+    this.#todoItemViewTagName = todoItemViewTagName;
 
     this.#view.addEventListener("todo-new-todo", (event) => {
       this.#model.dispatch(
@@ -89,7 +95,7 @@ export class TodoApp {
         }
       } else {
         // Add new
-        const todoItemView = new TodoItem();
+        const todoItemView = document.createElement(this.#todoItemViewTagName);
         todoItemView.dataset.id = item.id;
         todoItemView.setAttribute("description", item.description);
         if (item.completed) {
