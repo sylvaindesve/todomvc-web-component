@@ -1,8 +1,9 @@
-import "../../public/js/components/TodoList.mjs";
-import { beforeEach, describe, it } from "mocha";
 import chai, { expect } from "chai";
-import sinon from "sinon";
+import { beforeEach, describe, it } from "mocha";
+import { fake } from "sinon";
 import sinonChai from "sinon-chai";
+
+import "../../public/js/components/TodoList.mjs";
 
 chai.use(sinonChai);
 
@@ -10,7 +11,7 @@ describe("TodoList", function () {
   beforeEach(function () {
     document.body.innerHTML = `<todo-list items-left="4" filter="completed"></todo-list>`;
     this.currentTest.todoList = document.querySelector("todo-list");
-    this.currentTest.eventListenerCallback = sinon.fake();
+    this.currentTest.eventListenerCallback = fake();
   });
   describe("New todo input", function () {
     it("should have a input to enter a new todo", function () {

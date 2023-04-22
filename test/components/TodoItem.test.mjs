@@ -1,8 +1,9 @@
-import "../../public/js/components/TodoItem.mjs";
-import { beforeEach, describe, it } from "mocha";
 import chai, { expect } from "chai";
-import sinon from "sinon";
+import { beforeEach, describe, it } from "mocha";
+import { fake } from "sinon";
 import sinonChai from "sinon-chai";
+
+import "../../public/js/components/TodoItem.mjs";
 
 chai.use(sinonChai);
 
@@ -10,7 +11,7 @@ describe("TodoItem", function () {
   beforeEach(function () {
     document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
     this.currentTest.todoItem = document.querySelector("todo-item");
-    this.currentTest.eventListenerCallback = sinon.fake();
+    this.currentTest.eventListenerCallback = fake();
   });
   it("should be in view mode", function () {
     expect(this.test.todoItem.viewSection.classList.contains("hide")).to.be

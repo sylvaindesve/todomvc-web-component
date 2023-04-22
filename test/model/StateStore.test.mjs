@@ -1,6 +1,7 @@
-import { describe, it } from "mocha";
-import { StateStore } from "../../public/js/model/StateStore.mjs";
 import { expect } from "chai";
+import { describe, it } from "mocha";
+
+import { StateStore } from "../../public/js/model/StateStore.mjs";
 
 describe("StateStore", () => {
   it("should initialize state", () => {

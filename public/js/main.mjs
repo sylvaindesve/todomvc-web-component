@@ -1,9 +1,10 @@
-import "./components/TodoItem.mjs";
-import { StateStore } from "./model/StateStore.mjs";
-import { TodoApp } from "./controller/TodoApp.mjs";
 import { TodoList } from "./components/TodoList.mjs";
-import reducer from "./model/reducer.mjs";
+import { TodoApp } from "./controller/TodoApp.mjs";
 import { setState } from "./model/actions.mjs";
+import reducer from "./model/reducer.mjs";
+import { StateStore } from "./model/StateStore.mjs";
+
+import "./components/TodoItem.mjs";
 
 document.addEventListener("DOMContentLoaded", () => {
   const store = new StateStore(reducer);

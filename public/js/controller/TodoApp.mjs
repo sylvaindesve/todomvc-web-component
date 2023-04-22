@@ -2,11 +2,11 @@ import {
   addItem,
   completeItem,
   removeCompleted,
+  removeItem,
   setFilter,
   uncompleteItem,
   updateItemDescription,
 } from "../model/actions.mjs";
-import { removeItem } from "../model/actions.mjs";
 import { selectItems } from "../model/reducer.mjs";
 
 export class TodoApp {

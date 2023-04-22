@@ -1,3 +1,6 @@
+import { expect } from "chai";
+import { describe, it } from "mocha";
+
 import {
   addItem,
   completeItem,
@@ -8,9 +11,7 @@ import {
   uncompleteItem,
   updateItemDescription,
 } from "../../public/js/model/actions.mjs";
-import { describe, it } from "mocha";
 import reducer, { selectItems } from "../../public/js/model/reducer.mjs";
-import { expect } from "chai";
 
 function getThreeItemsState() {
   return {
