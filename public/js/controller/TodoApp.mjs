@@ -8,6 +8,7 @@ import {
   updateItemDescription,
 } from "../model/actions.mjs";
 import { selectItems } from "../model/reducer.mjs";
+import { randomUUID } from "../utils.mjs";
 
 export class TodoApp {
   /** @type {import("../model/StateStore.mjs").StateStore<import("../model/reducer.mjs").TodoState>} */
@@ -30,7 +31,7 @@ export class TodoApp {
     this.#view.addEventListener("todo-new-todo", (event) => {
       this.#model.dispatch(
         addItem({
-          id: crypto.randomUUID(),
+          id: randomUUID(),
           description: event.detail,
           completed: false,
         })
@@ -68,6 +69,8 @@ export class TodoApp {
     });
 
     this.#model.subscribe(() => this.updateView());
+
+    this.updateView();
   }
 
   updateView() {
