@@ -121,7 +121,7 @@ describe("TodoApp", () => {
 
   describe("Manage the view", function () {
     it("should set the items left attribute of the view", function () {
-      expect(this.test.fakeView.getAttribute("items-left")).to.equal("2");
+      expect(this.test.fakeView.getAttribute("remaining")).to.equal("2");
     });
 
     it("should set the filter attribute of the view", function () {

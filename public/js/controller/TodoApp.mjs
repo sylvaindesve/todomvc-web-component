@@ -78,7 +78,7 @@ export class TodoApp {
     const filter = this.#model.getState().filter;
 
     this.#view.setAttribute(
-      "items-left",
+      "remaining",
       items.filter((item) => !item.completed).length
     );
     this.#view.setAttribute("filter", filter);

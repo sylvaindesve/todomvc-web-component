@@ -9,63 +9,65 @@ chai.use(sinonChai);
 
 describe("TodoList", function () {
   beforeEach(function () {
-    document.body.innerHTML = `<todo-list items-left="4" filter="completed"></todo-list>`;
-    this.currentTest.todoList = document.querySelector("todo-list");
-    this.currentTest.eventListenerCallback = fake();
+    document.body.innerHTML = `<todo-list remaining="4" filter="completed"></todo-list>`;
+    this.todoList = document.querySelector("todo-list");
+    this.eventListenerCallback = fake();
   });
   describe("New todo input", function () {
     it("should have a input to enter a new todo", function () {
-      expect(this.test.todoList.newTodoInput.placeholder).to.equal(
+      expect(getNewTodoInput(this.todoList).placeholder).to.equal(
         "Qu'est-ce qui doit être fait ?"
       );
     });
 
     it("should dispatch a 'todo-new-todo' event with the new todo description when the new todo input change", function () {
-      this.test.todoList.addEventListener(
+      this.todoList.addEventListener(
         "todo-new-todo",
-        this.test.eventListenerCallback
+        this.eventListenerCallback
       );
-      this.test.todoList.newTodoInput.value = "Nouvelle chose à faire";
-      this.test.todoList.newTodoInput.dispatchEvent(new Event("change"));
-      expect(this.test.eventListenerCallback).to.have.been.called;
-      expect(
-        this.test.eventListenerCallback.firstCall.firstArg.detail
-      ).to.equal("Nouvelle chose à faire");
+      getNewTodoInput(this.todoList).value = "Nouvelle chose à faire";
+      getNewTodoInput(this.todoList).dispatchEvent(new Event("change"));
+      expect(this.eventListenerCallback).to.have.been.called;
+      expect(this.eventListenerCallback.firstCall.firstArg.detail).to.equal(
+        "Nouvelle chose à faire"
+      );
     });
   });
 
-  describe("Number of items left", function () {
-    it("should indicate the number of items left", function () {
-      expect(this.test.todoList.itemsLeftParagraph.innerHTML).to.equal(
+  describe("Number of items remaining", function () {
+    it("should indicate the number of items remaining", function () {
+      expect(getRemainingParagraph(this.todoList).innerHTML).to.equal(
         "4 tâches à faire"
       );
     });
 
-    it("should default to 0 if the number of items left is absent", function () {
+    it("should default to 0 if the number of items remaining is absent", function () {
       document.body.innerHTML = `<todo-list></todo-list>`;
       const todoList = document.querySelector("todo-list");
-      expect(todoList.itemsLeftParagraph.innerHTML).to.equal(
+      expect(getRemainingParagraph(todoList).innerHTML).to.equal(
         "0 tâches à faire"
       );
     });
 
-    it("should default to 0 if the number of items left is not a number", function () {
-      document.body.innerHTML = `<todo-list items-left="toto"></todo-list>`;
+    it("should default to 0 if the number of items remaining is not a number", function () {
+      document.body.innerHTML = `<todo-list remaining="toto"></todo-list>`;
       const todoList = document.querySelector("todo-list");
-      expect(todoList.itemsLeftParagraph.innerHTML).to.equal(
+      expect(getRemainingParagraph(todoList).innerHTML).to.equal(
         "0 tâches à faire"
       );
     });
 
-    it("should take into account singular form for the number of items left", function () {
-      document.body.innerHTML = `<todo-list items-left="1"></todo-list>`;
+    it("should take into account singular form for the number of items remaining", function () {
+      document.body.innerHTML = `<todo-list remaining="1"></todo-list>`;
       const todoList = document.querySelector("todo-list");
-      expect(todoList.itemsLeftParagraph.innerHTML).to.equal("1 tâche à faire");
+      expect(getRemainingParagraph(todoList).innerHTML).to.equal(
+        "1 tâche à faire"
+      );
     });
 
-    it("should update when the number of items left is changed", function () {
-      this.test.todoList.setAttribute("items-left", "5");
-      expect(this.test.todoList.itemsLeftParagraph.innerHTML).to.equal(
+    it("should update when the number of items remaining is changed", function () {
+      this.todoList.setAttribute("remaining", "5");
+      expect(getRemainingParagraph(this.todoList).innerHTML).to.equal(
         "5 tâches à faire"
       );
     });
@@ -74,23 +76,23 @@ describe("TodoList", function () {
   describe("Filters", function () {
     it("should have filters for all, active and completed", function () {
       expect(
-        Array.from(this.test.todoList.filterLinks).map((node) => node.innerHTML)
+        Array.from(getFilterLinkks(this.todoList)).map((node) => node.innerHTML)
       ).to.deep.equal(["Tous", "A faire", "Terminés"]);
     });
 
     it("should show the currrently selected filter", function () {
       expect(
-        this.test.todoList.filtersList
+        getFiltersList(this.todoList)
           .querySelector(".completed")
           .classList.contains("selected")
       ).to.be.true;
       expect(
-        this.test.todoList.filtersList
+        getFiltersList(this.todoList)
           .querySelector(".all")
           .classList.contains("selected")
       ).to.be.false;
       expect(
-        this.test.todoList.filtersList
+        getFiltersList(this.todoList)
           .querySelector(".active")
           .classList.contains("selected")
       ).to.be.false;
@@ -100,7 +102,7 @@ describe("TodoList", function () {
       document.body.innerHTML = `<todo-list></todo-list>`;
       const todoList = document.querySelector("todo-list");
       expect(
-        todoList.filtersList
+        getFiltersList(todoList)
           .querySelector(".all")
           .classList.contains("selected")
       ).to.be.true;
@@ -110,53 +112,73 @@ describe("TodoList", function () {
       document.body.innerHTML = `<todo-list filter="toto"></todo-list>`;
       const todoList = document.querySelector("todo-list");
       expect(
-        todoList.filtersList
+        getFiltersList(todoList)
           .querySelector(".all")
           .classList.contains("selected")
       ).to.be.true;
     });
 
     it("should update when the filter value is changed", function () {
-      this.test.todoList.setAttribute("filter", "active");
+      this.todoList.setAttribute("filter", "active");
       expect(
-        this.test.todoList.filtersList
+        getFiltersList(this.todoList)
           .querySelector(".completed")
           .classList.contains("selected")
       ).to.be.false;
       expect(
-        this.test.todoList.filtersList
+        getFiltersList(this.todoList)
           .querySelector(".active")
           .classList.contains("selected")
       ).to.be.true;
     });
 
     it("should dispatch a 'todo-filter-selected' event  with filter value when a filter is clicked", function () {
-      this.test.todoList.addEventListener(
+      this.todoList.addEventListener(
         "todo-filter-selected",
-        this.test.eventListenerCallback
+        this.eventListenerCallback
       );
-      this.test.todoList.filtersList.querySelector(".active").click();
-      expect(this.test.eventListenerCallback).to.have.been.called;
-      expect(
-        this.test.eventListenerCallback.firstCall.firstArg.detail
-      ).to.equal("active");
+      getFiltersList(this.todoList).querySelector(".active").click();
+      expect(this.eventListenerCallback).to.have.been.called;
+      expect(this.eventListenerCallback.firstCall.firstArg.detail).to.equal(
+        "active"
+      );
     });
   });
 
   describe("Clear completed", function () {
     it("should have a 'Clear completed' button", function () {
-      expect(this.test.todoList.clearCompletedButton.innerHTML).to.equal(
+      expect(getClearCompletedButton(this.todoList).innerHTML).to.equal(
         "Supprimer les tâches terminées"
       );
     });
 
     it("should dispatch a 'todo-clear-completed' event when the button is clicked", function () {
-      this.test.todoList.addEventListener(
+      this.todoList.addEventListener(
         "todo-clear-completed",
-        this.test.eventListenerCallback
+        this.eventListenerCallback
       );
-      this.test.todoList.clearCompletedButton.click();
-      expect(this.test.eventListenerCallback).to.have.been.called;
+      getClearCompletedButton(this.todoList).click();
+      expect(this.eventListenerCallback).to.have.been.called;
     });
   });
 });
+
+function getNewTodoInput(todoList) {
+  return todoList.shadowRoot.querySelector(".new-todo");
+}
+
+function getRemainingParagraph(todoList) {
+  return todoList.shadowRoot.querySelector(".remaining");
+}
+
+function getFiltersList(todoList) {
+  return todoList.shadowRoot.querySelector(".filters");
+}
+
+function getFilterLinkks(todoList) {
+  return todoList.shadowRoot.querySelectorAll(".filters a");
+}
+
+function getClearCompletedButton(todoList) {
+  return todoList.shadowRoot.querySelector(".clear-completed");
+}
