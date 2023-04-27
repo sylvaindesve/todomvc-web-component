@@ -64,6 +64,19 @@ template.innerHTML = `
 <input class="edit hide" />
 `;
 
+/**
+ * Un composant représentant une tâche à faire.
+ *
+ * @tagname todo-iem
+ *
+ * @attribute {string} description - Description de la tâche à faire
+ * @attribute {boolean} completed - Indique si la tâche est faite
+ *
+ * @fires {CustomEvent} todo-item-to-do - Pour indiquer que la tâche est désormais à faire
+ * @fires {CustomEvent} todo-item-completed - Pour indiquer que la tâche est désormais terminée
+ * @fires {CustomEvent} todo-item-deleted - Pour indiquer que la tâche est supprimée
+ * @fires {CustomEvent} todo-item-description-updated - Pour indiquer que la description de la tâche a été modifiée
+ */
 export class TodoItem extends HTMLElement {
   static get observedAttributes() {
     return ["description", "completed"];
