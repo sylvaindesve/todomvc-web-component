@@ -78,10 +78,6 @@ template.innerHTML = `
  * @fires {CustomEvent} todo-item-description-updated - Pour indiquer que la description de la tâche a été modifiée
  */
 export class TodoItem extends HTMLElement {
-  static get observedAttributes() {
-    return ["description", "completed"];
-  }
-
   // Nodes
   #viewSection;
   #descriptionLabel;
@@ -90,6 +86,8 @@ export class TodoItem extends HTMLElement {
   #editDescriptionInput;
 
   // Properties
+  #description = "Tâche à faire";
+  #completed = false;
   #editing = false;
   #editDescription = "";
 
@@ -132,36 +130,22 @@ export class TodoItem extends HTMLElement {
     });
   }
 
-  attributeChangedCallback(name) {
-    if (name === "description") {
-      this.#descriptionLabel.innerHTML = this.description;
-    }
-
-    if (name === "completed") {
-      if (this.completed) {
-        this.#completedCheckbox.checked = true;
-      } else {
-        this.#completedCheckbox.checked = false;
-      }
-    }
-  }
-
   set description(value) {
-    this.setAttribute("description", value);
+    this.#description = String(value);
+    this.#descriptionLabel.innerHTML = this.#description;
   }
 
   get description() {
-    return this.getAttribute("description");
+    return this.#description;
   }
 
   set completed(value) {
-    const isCompleted = Boolean(value);
-    if (isCompleted) this.setAttribute("completed", "");
-    else this.removeAttribute("completed");
+    this.#completed = Boolean(value);
+    this.#completedCheckbox.checked = this.#completed;
   }
 
   get completed() {
-    return this.hasAttribute("completed");
+    return this.#completed;
   }
 
   set editing(isEditing) {

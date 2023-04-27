@@ -7,7 +7,7 @@ import {
   uncompleteItem,
   updateItemDescription,
 } from "../model/actions.mjs";
-import { selectItems } from "../model/reducer.mjs";
+import { countRemainingItems, selectVisibleItems } from "../model/reducer.mjs";
 import { randomUUID } from "../utils.mjs";
 
 export class TodoApp {
@@ -74,12 +74,12 @@ export class TodoApp {
   }
 
   updateView() {
-    const items = selectItems(this.#model.getState());
+    const items = selectVisibleItems(this.#model.getState());
     const filter = this.#model.getState().filter;
 
     this.#view.setAttribute(
       "remaining",
-      items.filter((item) => !item.completed).length
+      countRemainingItems(this.#model.getState())
     );
     this.#view.setAttribute("filter", filter);
 
@@ -90,20 +90,14 @@ export class TodoApp {
       );
       if (currentTodoItemView) {
         // Update current
-        currentTodoItemView.setAttribute("description", item.description);
-        if (item.completed) {
-          currentTodoItemView.setAttribute("completed", "completed");
-        } else {
-          currentTodoItemView.removeAttribute("completed");
-        }
+        currentTodoItemView.description = item.description;
+        currentTodoItemView.completed = item.completed;
       } else {
         // Add new
         const todoItemView = document.createElement(this.#todoItemViewTagName);
         todoItemView.dataset.id = item.id;
-        todoItemView.setAttribute("description", item.description);
-        if (item.completed) {
-          todoItemView.setAttribute("completed", "completed");
-        }
+        todoItemView.description = item.description;
+        todoItemView.completed = item.completed;
         this.#view.appendChild(todoItemView);
       }
     });

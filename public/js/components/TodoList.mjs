@@ -4,12 +4,6 @@ const style = `
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
   background: #fff;
 }
-:host([filter="active"]) ::slotted([completed]) {
-  display: none !important;
-}
-:host([filter="completed"]) ::slotted(:not([completed])) {
-  display: none !important;
-}
 
 .new-todo {
   box-sizing: border-box;

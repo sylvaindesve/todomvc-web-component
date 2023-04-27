@@ -9,8 +9,9 @@ chai.use(sinonChai);
 
 describe("TodoItem", function () {
   beforeEach(function () {
-    document.body.innerHTML = `<todo-item description="Quelque chose"></todo-item>`;
+    document.body.innerHTML = `<todo-item></todo-item>`;
     this.todoItem = document.querySelector("todo-item");
+    this.todoItem.description = "Quelque chose";
     this.eventListenerCallback = fake();
   });
   it("should be in view mode", function () {
@@ -39,9 +40,8 @@ describe("TodoItem", function () {
   });
 
   it("should be checked if completed", function () {
-    document.body.innerHTML = `<todo-item description="Quelque chose" completed></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    expect(getCompletedCheckbox(todoItem).checked).to.be.true;
+    this.todoItem.completed = true;
+    expect(getCompletedCheckbox(this.todoItem).checked).to.be.true;
   });
 
   it("should update when completed attribute is changed", function () {
@@ -61,10 +61,12 @@ describe("TodoItem", function () {
   });
 
   it("should dispatch a 'todo-item-to-do' event when the checkbox is unchecked", function () {
-    document.body.innerHTML = `<todo-item description="Quelque chose" completed></todo-item>`;
-    const todoItem = document.querySelector("todo-item");
-    todoItem.addEventListener("todo-item-to-do", this.eventListenerCallback);
-    getCompletedCheckbox(todoItem).click();
+    this.todoItem.completed = true;
+    this.todoItem.addEventListener(
+      "todo-item-to-do",
+      this.eventListenerCallback
+    );
+    getCompletedCheckbox(this.todoItem).click();
     expect(this.eventListenerCallback).to.have.been.called;
   });
 

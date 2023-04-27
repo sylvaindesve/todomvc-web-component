@@ -11,7 +11,11 @@ import {
   uncompleteItem,
   updateItemDescription,
 } from "../../public/js/model/actions.mjs";
-import reducer, { selectItems } from "../../public/js/model/reducer.mjs";
+import reducer, {
+  countRemainingItems,
+  selectItems,
+  selectVisibleItems,
+} from "../../public/js/model/reducer.mjs";
 
 function getThreeItemsState() {
   return {
@@ -323,6 +327,64 @@ describe("selectItems", function () {
         id: "item-3",
         description: "Item 3",
         completed: false,
+      },
+    ]);
+  });
+});
+
+describe("countRemainingItems", function () {
+  it("should return the number of remainign items", function () {
+    const remaining = countRemainingItems(getThreeItemsState());
+    expect(remaining).to.equal(2);
+  });
+});
+
+describe("selectVisibleItems", function () {
+  it("should return all items if filter is 'all'", function () {
+    expect(selectVisibleItems(getThreeItemsState())).to.deep.equal([
+      {
+        id: "item-1",
+        description: "Item 1",
+        completed: false,
+      },
+      {
+        id: "item-2",
+        description: "Item 2",
+        completed: true,
+      },
+      {
+        id: "item-3",
+        description: "Item 3",
+        completed: false,
+      },
+    ]);
+  });
+
+  it("should return non completed items if filter is 'active'", function () {
+    expect(
+      selectVisibleItems({ ...getThreeItemsState(), filter: "active" })
+    ).to.deep.equal([
+      {
+        id: "item-1",
+        description: "Item 1",
+        completed: false,
+      },
+      {
+        id: "item-3",
+        description: "Item 3",
+        completed: false,
+      },
+    ]);
+  });
+
+  it("should return completed items if filter is 'completed'", function () {
+    expect(
+      selectVisibleItems({ ...getThreeItemsState(), filter: "completed" })
+    ).to.deep.equal([
+      {
+        id: "item-2",
+        description: "Item 2",
+        completed: true,
       },
     ]);
   });

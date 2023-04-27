@@ -132,19 +132,49 @@ describe("TodoApp", () => {
       expect(this.test.fakeView.children.length).to.equal(3);
     });
 
+    it("should append children to the view based on the filter value", function () {
+      const fakeModel = {
+        dispatch: fake(),
+        getState: function () {
+          return {
+            items: {
+              "item-1": {
+                id: "item-1",
+                description: "Item 1",
+                completed: false,
+              },
+              "item-2": {
+                id: "item-2",
+                description: "Item 2",
+                completed: true,
+              },
+              "item-3": {
+                id: "item-3",
+                description: "Item 3",
+                completed: false,
+              },
+            },
+            filter: "active",
+          };
+        },
+        subscribe: fake(),
+      };
+      const fakeView = document.createElement("ul");
+      new TodoApp(fakeModel, fakeView, "li");
+      expect(fakeView.children.length).to.equal(2);
+    });
+
     it("should set the description for each item", function () {
       expect(
-        Array.from(this.test.fakeView.children).map((child) =>
-          child.getAttribute("description")
+        Array.from(this.test.fakeView.children).map(
+          (child) => child.description
         )
       ).to.deep.equal(["Item 1", "Item 2", "Item 3"]);
     });
 
     it("should set the completed state for each item", function () {
       expect(
-        Array.from(this.test.fakeView.children).map((child) =>
-          child.hasAttribute("completed")
-        )
+        Array.from(this.test.fakeView.children).map((child) => child.completed)
       ).to.deep.equal([false, true, false]);
     });
 
@@ -217,11 +247,10 @@ describe("TodoApp", () => {
       expect(
         Array.from(fakeView.children).map((child) => ({
           id: child.dataset.id,
-          description: child.getAttribute("description"),
-          completed: child.hasAttribute("completed"),
+          description: child.description,
+          completed: child.completed,
         }))
       ).to.deep.equal([
-        { id: "item-1", description: "Item 1", completed: true },
         { id: "item-3", description: "Item 3 updated", completed: false },
         { id: "item-4", description: "Item 4", completed: false },
       ]);

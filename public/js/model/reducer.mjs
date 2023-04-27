@@ -142,4 +142,28 @@ export function selectItems(state) {
   return Object.values(state.items);
 }
 
+/**
+ * Renvoie les items de l'état sous forme d'un tableau
+ * @param {TodoState} state
+ * @returns {number}
+ */
+export function countRemainingItems(state) {
+  return Object.values(state.items).filter((item) => !item.completed).length;
+}
+
+/**
+ * Renvoie les items de l'état sous forme d'un tableau
+ * @param {TodoState} state
+ * @returns {TodoItem[]}
+ */
+export function selectVisibleItems(state) {
+  if (state.filter === "active") {
+    return Object.values(state.items).filter((item) => !item.completed);
+  }
+  if (state.filter === "completed") {
+    return Object.values(state.items).filter((item) => item.completed);
+  }
+  return Object.values(state.items);
+}
+
 export default reducer;
